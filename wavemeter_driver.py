@@ -1,14 +1,9 @@
 import mogdevice
+import time
 
-'''
-Pretty much rewrite all of this,
 
--   will need a property detector
-overall driver will be a class
-'''
-class wavemeter_driver:
+class Wavemeter_driver:
     wm = None
-    connection_status = False
 
 
     # parameterized constructor
@@ -18,18 +13,23 @@ class wavemeter_driver:
 
     
     # attempts to create a connecting with the wavemeter
-    def connect_to_wavemeter(self, link):
-         
-        self.connection_status = True
+    def connect_to_wavemeter(self, link, attempt=0):
+         #will ensure that it is not on its 10th connection attempt
+        if attempt >= 10:
+            print('Wavemeter Connection Failure')
+            return
+
         try: 
             self.wm = mogdevice.MOGDevice('mog-fzw-a03052.graulab.odu.edu')
         except Exception as e:
-            self.connection_status = False
-            print("wavemter error:", e)
-    
+            print("wavemter connection error ",attempt, ":", e)
+            time.sleep(1)
+            self.connect_to_wavemeter(link, attempt+1)
     
     # gets the wavelength
-    def getWL(self, laserNumber):
+    @property
+    def getWL(self):
+        laserNumber = 1
         #checks the wavemeter's connection
         if self.connection_status == False:
             return 'Wavemeter connection failure'
@@ -38,6 +38,8 @@ class wavemeter_driver:
         #sockets 1 through 8 
         if 1 <= laserNumber <= 8:
             self.wm.ask('optsw,set,'+str(laserNumber))
+        else:
+            self.wm.ask('optsw,set,1')
 
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
@@ -57,5 +59,7 @@ class wavemeter_driver:
     
 
 
-#x = wavemeter_driver('mog-fzw-a03052.graulab.odu.edu')
-#print(x.getWL(1))
+#x = Wavemeter_driver('mog-fzw-a03052.graulab.odu.edu')
+
+#print('wavemeter connection: ', x.connection_status)
+#print('wavelength: ', x.getWL)
