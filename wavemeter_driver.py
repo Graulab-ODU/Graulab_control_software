@@ -72,15 +72,26 @@ class Channel:
     _device = None
     _index: int=0
     def __init__(self, device, index):
+
+        # if input is not 1-8, it will be set to 1
+        if 1 > index or index > 8:
+            index = 1
+
         self._device = device
         self._index = index
+
+        
     
     @property
     def wavelength(self):
+        # changes sockets the wavemeter is measuring
         self._device.ask('optsw,set,'+str(self._index))
-        return self._device.ask('meas,wl')
-        
-    
 
+        #will attempt to measure the wavelength, if it fails it returns 'low contrast'
+        try:
+            wl = self._device.ask('meas,wl')
+        except RuntimeError:
+            return 'Low Contrast'
+        return wl 
 
-        #add functions for frequency and the interference fringe (there are two of them)
+#add functions for frequency and the interference fringe (there are two of them)
