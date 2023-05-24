@@ -34,12 +34,11 @@ class Wavemeter_driver:
         if self.connection_status == False:
             return 'Wavemeter connection failure'
 
-        #sets the laser to the specified input
-        #sockets 1 through 8 
-        if 1 <= laserNumber <= 8:
-            self.wm.ask('optsw,set,'+str(laserNumber))
+        # if input is not 1-8, it will be set to 1
+        if 1 > laserNumber or laserNumber > 8:
+            laserNumber = 1
         else:
-            self.wm.ask('optsw,set,1')
+            self.wm.ask('optsw,set,'+str(laserNumber))
 
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
