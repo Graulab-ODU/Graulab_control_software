@@ -20,7 +20,7 @@ class Wavemeter:
             return
 
         try: 
-            self.wm = mogdevice.MOGDevice(link)
+            self._device = mogdevice.MOGDevice(link)
         except Exception as e:
             print("wavemter connection error ",attempt, ":", e)
             time.sleep(1)
@@ -39,7 +39,7 @@ class Wavemeter:
         if 1 > laserNumber or laserNumber > 8:
             laserNumber = 1
         else:
-            self.wm.ask('optsw,set,'+str(laserNumber))
+            self._device.ask('optsw,set,'+str(laserNumber))
 
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
@@ -50,12 +50,13 @@ class Wavemeter:
     
     # checks the connection to the wavemeter
     def connection_status(self):
-        return self.wm.connected()
+        return self._device.connected()
 
 
     # overrides the index operator
-    def __getitem__(self, channel): #will return the object of the correct channel
-        return self.channels.wavelength(channel)
+    def __getitem__(self, channel_index): #will return the object of the correct channel
+        print('index: ', channel_index)
+        return Channel(self._device, channel_index)
         
     # makes a representation of the wavemeter object
     def __repr__(self):
@@ -69,15 +70,17 @@ class Wavemeter:
 
 class Channel:
     _device = None
-
-    def __init__(self, device):
+    _index: int=0
+    def __init__(self, device, index):
         self._device = device
-
+        self._index = index
     
-    def wavelength(self, channel):
-        self._device.ask('optsw,set,'+str(channel))
-        return self.wavelength_1
-        
     @property
-    def wavelength_1(self):
-        self.device.ask('optsw,set,1')
+    def wavelength(self):
+        self._device.ask('optsw,set,'+str(self._index))
+        return self._device.ask('meas,wl')
+        
+    
+
+
+        #add functions for frequency and the interference fringe (there are two of them)
