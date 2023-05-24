@@ -4,14 +4,12 @@ import time
 
 class Wavemeter:
     _device = None
-    channels = None
 
 
     # parameterized consctor
     def __init__(self, link):
         
         self._connect(link)
-        self.channels = Channel(self._device)
 
     
     # attempts to create a connecting with the wavemeter
@@ -61,7 +59,7 @@ class Wavemeter:
         
     # makes a representation of the wavemeter object
     def __repr__(self):
-        
+        return 'Wavemeter(\'\')'
 
     
     
