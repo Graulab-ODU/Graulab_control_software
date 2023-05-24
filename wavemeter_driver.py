@@ -4,7 +4,7 @@ import time
 
 class Wavemeter_driver:
     wm = None
-
+    connection_status2 = False
 
     # parameterized constructor
     def __init__(self, link):
@@ -19,8 +19,10 @@ class Wavemeter_driver:
             print('Wavemeter Connection Failure')
             return
 
+        self.connection_status2 = False
         try: 
             self.wm = mogdevice.MOGDevice('mog-fzw-a03052.graulab.odu.edu')
+            self.connection_status2 = True
         except Exception as e:
             print("wavemter connection error ",attempt, ":", e)
             time.sleep(1)
@@ -31,7 +33,7 @@ class Wavemeter_driver:
     def getWL(self):
         laserNumber = 1
         #checks the wavemeter's connection
-        if self.connection_status == False:
+        if self.connection_status2 == False:
             return 'Wavemeter connection failure'
 
         # if input is not 1-8, it will be set to 1
@@ -56,9 +58,3 @@ class Wavemeter_driver:
     def reconnect(self,timeout=1,check=True): 
         self.wm.reconnect(timeout, check)
     
-
-
-#x = Wavemeter_driver('mog-fzw-a03052.graulab.odu.edu')
-
-#print('wavemeter connection: ', x.connection_status)
-#print('wavelength: ', x.getWL)
