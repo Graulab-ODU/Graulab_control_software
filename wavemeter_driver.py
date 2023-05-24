@@ -89,9 +89,10 @@ class Channel:
 
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
-            wl = self._device.ask('meas,wl')
+            wl = self._device.ask('meas,wl,vac')
+            value = float(wl.replace('nm(vac)', ''))
         except RuntimeError:
             return 'Low Contrast'
-        return wl 
+        return value
 
 #add functions for frequency and the interference fringe (there are two of them)
