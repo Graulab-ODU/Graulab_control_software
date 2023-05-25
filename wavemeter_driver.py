@@ -1,6 +1,6 @@
 import mogdevice
 import time
-
+import numpy as np
 
 class Wavemeter:
     _device = None
@@ -9,11 +9,11 @@ class Wavemeter:
     # parameterized consctor
     def __init__(self, link):
         
-        self._connect(link)
+        self._connect_to_wavemeter(link)
 
     
     # attempts to create a connecting with the wavemeter
-    def _connect(self, link, attempt=0):
+    def _connect_to_wavemeter(self, link, attempt=0):
          #will ensure that it is not on its 10th connection attempt
         if attempt >= 10:
             print('Wavemeter Connection Failure')
@@ -24,7 +24,9 @@ class Wavemeter:
         except Exception as e:
             print("wavemter connection error ",attempt, ":", e)
             time.sleep(1)
-            self.connect_to_wavemeter(link, attempt+1)
+            self._connect_to_wavemeter(link, attempt+1)
+
+        
     
 
     # gets the wavelength
@@ -35,12 +37,7 @@ class Wavemeter:
         if self.connection_status == False:
             return 'Wavemeter connection failure'
 
-        # if input is not 1-8, it will be set to 1
-        if 1 > laserNumber or laserNumber > 8:
-            laserNumber = 1
-        else:
-            self._device.ask('optsw,set,'+str(laserNumber))
-
+        
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
             wl = self.wm.ask('meas,wl')
@@ -81,6 +78,10 @@ class Channel:
         self._index = index
 
         
+        self._device.ask('optsw,set,'+str(index))
+
+
+        
     
     @property
     def wavelength(self):
@@ -95,4 +96,13 @@ class Channel:
             return 'Low Contrast'
         return value
 
-#add functions for frequency and the interference fringe (there are two of them)
+    @property
+    def fringe(self):
+        '''Returns the interference fringe as a numpy array'''
+        return np.frombuffer(self._device.ask_bin('meas,img,2'), dtype='uint8')
+
+#numpy.frombuffer(_device.ask_bin('meas,img,{_index}), dtype='uint8')
+
+#add functions for the interference fringe (there are two of them)
+#   wm.ask('meas,contrast')  measures the contrast which is the fringe quality
+#  the saturation is the fringe quality
