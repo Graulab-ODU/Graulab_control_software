@@ -32,7 +32,7 @@ class Wavemeter:
     # gets the wavelength
     @property
     def getWL(self):
-        laserNumber = 1
+        
         #checks the wavemeter's connection
         if self.connection_status == False:
             return 'Wavemeter connection failure'
@@ -78,7 +78,7 @@ class Channel:
         self._index = index
 
         
-        self._device.ask('optsw,set,'+str(index))
+        self._device.ask('optsw,select,'+str(index))
 
 
         
@@ -86,7 +86,7 @@ class Channel:
     @property
     def wavelength(self):
         # changes sockets the wavemeter is measuring
-        self._device.ask('optsw,set,'+str(self._index))
+        self._device.ask('optsw,select,'+str(self._index))
 
         #will attempt to measure the wavelength, if it fails it returns 'low contrast'
         try:
