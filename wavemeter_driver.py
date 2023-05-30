@@ -68,6 +68,7 @@ class Wavemeter:
 class Channel:
     _device = None
     _index: int=0
+    _etalon = 0
     def __init__(self, device, index):
 
         # if input is not 1-8, it will be set to 1
@@ -99,10 +100,35 @@ class Channel:
     @property
     def fringe(self):
         '''Returns the interference fringe as a numpy array'''
-        return np.frombuffer(self._device.ask_bin('meas,img,2'), dtype='uint8')
+        return Fringe(self._device)
+    
+    
+    
 
-#numpy.frombuffer(_device.ask_bin('meas,img,{_index}), dtype='uint8')
 
-#add functions for the interference fringe (there are two of them)
-#   wm.ask('meas,contrast')  measures the contrast which is the fringe quality
-#  the saturation is the fringe quality
+class Fringe:
+    _device = None
+    _etalon_index: int=0
+
+    def __init__(self, _device):
+        self._device = _device
+
+    @property
+    def _fringe(self):
+        '''Returns the interference fringe as a numpy array'''
+        array = np.frombuffer(self._device.ask_bin(f'meas,img,{self._etalon_index}'), dtype='uint8')
+        return array[:512-len(array)]
+        #returns a 512 byte array, this removes the extra data
+
+    
+    # overrides the index operator
+    def __getitem__(self, etalon_index): 
+        #checks the index
+        try:
+            assert(0 <= etalon_index <= 3)
+        except Exception as e:
+            print('Error: Invalid Etalon')
+
+        self._etalon_index = etalon_index
+        return self._fringe
+  
