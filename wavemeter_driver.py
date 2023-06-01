@@ -49,10 +49,11 @@ class Wavemeter:
     def connection_status(self):
         return self._device.connected()
     
-    # changes the wavemeters channel
-    def set_channel(self, port):
+    # changes the wavemeter's optical fiber input port
+    def set_port(self, port):
         assert(0 < port <= 8)
         self._device.ask(f'optsw,set,{port}')
+        print('port:', port)
 
 
     # overrides the index operator
