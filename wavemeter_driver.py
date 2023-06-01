@@ -48,6 +48,11 @@ class Wavemeter:
     # checks the connection to the wavemeter
     def connection_status(self):
         return self._device.connected()
+    
+    # changes the wavemeters channel
+    def set_channel(self, port):
+        assert(0 < port <= 8)
+        self._device.ask(f'optsw,set,{port}')
 
 
     # overrides the index operator
@@ -70,10 +75,10 @@ class Channel:
     _index: int=0
     _etalon = 0
     def __init__(self, device, index):
-
-        # if input is not 1-8, it will be set to 1
-        if 1 > index or index > 8:
-            index = 1
+        
+        # ensure that the index is a valid channel
+        assert(0 < index <= 8)
+        
 
         self._device = device
         self._index = index
@@ -128,6 +133,7 @@ class Fringe:
             assert(0 <= etalon_index <= 3)
         except Exception as e:
             print('Error: Invalid Etalon')
+            return
 
         self._etalon_index = etalon_index
         return self._fringe
