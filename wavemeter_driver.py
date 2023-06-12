@@ -15,21 +15,16 @@ class Wavemeter:
     # attempts to create a connecting with the wavemeter
     def _connect_to_wavemeter(self, link, attempt=0):
          #will ensure that it is not on its 10th connection attempt
-        if attempt >= 10:
-            print('Wavemeter Connection Failure')
-            return
-
-        try: 
-            self._device = mogdevice.MOGDevice(link)
-        except Exception as e:
-            print("wavemter connection error ",attempt, ":", e)
-            time.sleep(1)
-            self._connect_to_wavemeter(link, attempt+1)
-
-        
+        for i in range(10):
+            try: 
+                self._device = mogdevice.MOGDevice(link)
+                break
+            except Exception as e:
+                print("wavemter connection error ",attempt, ":", e)
+                time.sleep(1)
     
 
-    # gets the wavelength
+    '''# gets the wavelength
     @property
     def getWL(self):
         
@@ -43,7 +38,7 @@ class Wavemeter:
             wl = self.wm.ask('meas,wl')
         except RuntimeError:
             return 'Low Contrast'
-        return wl 
+        return wl '''
     
     # checks the connection to the wavemeter
     def connection_status(self):
@@ -51,23 +46,27 @@ class Wavemeter:
     
     # changes the wavemeter's optical fiber input port
     def set_port(self, port):
-        assert(0 < port <= 8)
-        self._device.ask(f'optsw,set,{port}')
-        print('port:', port)
+        if(0 < port <= 8):
+            self._device.ask(f'optsw,set,{port}')
+            print('port:', port)
+        else:
+            raise IndexError
 
 
     # overrides the index operator
     def __getitem__(self, channel_index): #will return the object of the correct channel
-        print('index: ', channel_index)
-        return Channel(self._device, channel_index)
+        
+        # ensure that the index is a valid channel
+        if(0 < channel_index <= 8):
+            print('index: ', channel_index)
+            return Channel(self._device, channel_index)
+        else:
+            raise IndexError
         
     # makes a representation of the wavemeter object
     def __repr__(self):
-        return 'Wavemeter(\'\')'
+        return 'Wavemeter(\' \')'
 
-    
-    
-    
 
 
 
@@ -76,20 +75,11 @@ class Channel:
     _index: int=0
     _etalon = 0
     def __init__(self, device, index):
-        
-        # ensure that the index is a valid channel
-        assert(0 < index <= 8)
-        
-
         self._device = device
         self._index = index
-
-        
         self._device.ask('optsw,select,'+str(index))
 
 
-        
-    
     @property
     def wavelength(self):
         # changes sockets the wavemeter is measuring
@@ -130,12 +120,8 @@ class Fringe:
     # overrides the index operator
     def __getitem__(self, etalon_index): 
         #checks the index
-        try:
-            assert(0 <= etalon_index <= 3)
-        except Exception as e:
-            print('Error: Invalid Etalon')
-            return
-
-        self._etalon_index = etalon_index
-        return self._fringe
-  
+        if(0 <= etalon_index <= 3):
+            self._etalon_index = etalon_index
+            return self._fringe
+        else:
+            raise IndexError
