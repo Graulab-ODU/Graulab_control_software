@@ -1,4 +1,4 @@
-import mogdevice
+import mogDevice_wavemeter.mogdevice as mogdevice
 import time
 import numpy as np
 
@@ -22,23 +22,6 @@ class Wavemeter:
             except Exception as e:
                 print("wavemter connection error ",attempt, ":", e)
                 time.sleep(1)
-    
-
-    '''# gets the wavelength
-    @property
-    def getWL(self):
-        
-        #checks the wavemeter's connection
-        if self.connection_status == False:
-            return 'Wavemeter connection failure'
-
-        
-        #will attempt to measure the wavelength, if it fails it returns 'low contrast'
-        try:
-            wl = self.wm.ask('meas,wl')
-        except RuntimeError:
-            return 'Low Contrast'
-        return wl '''
     
     # checks the connection to the wavemeter
     def connection_status(self):
