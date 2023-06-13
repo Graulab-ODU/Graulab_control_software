@@ -1,6 +1,5 @@
 import mogdevice 
 import time
-import numpy as np
 
 class Wavemeter:
     _device = None
@@ -29,10 +28,10 @@ class Wavemeter:
         return self._device.connected()
     
     # changes the wavemeter's optical fiber input port
-    def set_port(self, port):
-        if(0 < port <= 8):
-            self._device.ask(f'optsw,set,{port}')
-            print('port:', port)
+    def set_port(self, channel_index):
+        if(channel_index in (1,2,3,4,5,6,7,8)):
+            self._device.ask(f'optsw,set,{channel_index}')
+            print('port:', channel_index)
         else:
             raise IndexError
 
@@ -41,7 +40,7 @@ class Wavemeter:
     def __getitem__(self, channel_index): #will return the object of the correct channel
         
         # ensure that the index is a valid channel
-        if(0 < channel_index <= 8):
+        if(channel_index in (1,2,3,4,5,6,7,8)):
             return Channel(self._device, channel_index)
         else:
             raise IndexError
@@ -78,52 +77,58 @@ class Channel:
     
 
     def __repr__(self):
-        return f'Channel ({self._index}): Wavelength: {self.wavelength}'
+        return f'(Channel {self._index}): Wavelength: {self.wavelength}'
 
     @property
     def fringe(self):
-        '''Returns the interference fringe as a numpy array'''
-        return Fringe(self._device)
-    
+        '''Returns the all 4 interference fringes as an array'''
+        
+        #collected fringes 0 through 3, and converts them from byte array to a list
+        array0 = list(self._device.ask_bin(f'meas,img,0'))
+        array1 = list(self._device.ask_bin(f'meas,img,1'))
+        array2 = list(self._device.ask_bin(f'meas,img,2'))
+        array3 = list(self._device.ask_bin(f'meas,img,3'))
 
-    
-    
-    
-
-
-class Fringe:
-    _device = None
-    _etalon_index: int=0
-
-    def __init__(self, _device):
-        self._device = _device
+        #returns all 4 lists, removes any extra data beyond the 512th index
+        return array0[:512-len(array0)], array1[:512-len(array1)], array2[:512-len(array2)], array3[:512-len(array3)]
 
     @property
-    def _fringe(self):
-        '''Returns the interference fringe as a numpy array'''
-        array = np.frombuffer(self._device.ask_bin(f'meas,img,{self._etalon_index}'), dtype='uint8')
-        return array[:512-len(array)]
-        #returns a 512 byte array, this removes the extra data
-
-    
-    # overrides the index operator
-    def __getitem__(self, etalon_index): 
-        #checks the index
-        if(0 <= etalon_index <= 3):
-            self._etalon_index = etalon_index
-            return self._fringe
-        else:
-            raise IndexError
+    def fringe0(self):
+        '''Returns only the 0th interference fringe as an array'''
         
+        #collected fringe 0 converts it from byte array to a list
+        array = list(self._device.ask_bin(f'meas,img,0'))
 
+        #returns the list and removes any extra data beyond the 512th index
+        return array[:512-len(array)]
+    
+    @property
+    def fringe1(self):
+        '''Returns only the 1st interference fringe as an array'''
+        
+        #collected fringe 1 converts it from byte array to a list
+        array = list(self._device.ask_bin(f'meas,img,1'))
 
-#remove numby array return as list,
-#
-## make function for each fringe list and one for all, remove channel object
-#  make setu0.py a setup.cfg
+        #returns the list and removes any extra data beyond the 512th index
+        return array[:512-len(array)]
+    
+    @property
+    def fringe2(self):
+        '''Returns only the 2nd interference fringe as an array'''
+        
+        #collected fringe 2 converts it from byte array to a list
+        array = list(self._device.ask_bin(f'meas,img,2'))
 
+        #returns the list and removes any extra data beyond the 512th index
+        return array[:512-len(array)]
+    
+    @property
+    def fringe3(self):
+        '''Returns only the 3rd interference fringe as an array'''
+        
+        #collected fringe 3 converts it from byte array to a list
+        array = list(self._device.ask_bin(f'meas,img,3'))
 
+        #returns the list and removes any extra data beyond the 512th index
+        return array[:512-len(array)]
 
-
-
-# test the program
