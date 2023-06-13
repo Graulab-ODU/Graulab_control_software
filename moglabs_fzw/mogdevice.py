@@ -17,7 +17,6 @@ import serial
 import select
 from struct import unpack
 from collections import OrderedDict
-import six
 CRLF = b'\r\n'
 
 # Handles communication with devices
@@ -173,7 +172,7 @@ class MOGDevice(object):
         while self.has_data(timeout):
             chunk = self.recv(buffer)
             # handle the case where we get binary rubbish and prevent TypeError
-            if isinstance(chunk,six.binary_type) and not isinstance(dat,six.binary_type): dat = dat.encode()
+            if isinstance(chunk, bytes) and not isinstance(dat, bytes): dat = dat.encode()
             dat += chunk
         return dat
     
