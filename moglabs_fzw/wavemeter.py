@@ -1,4 +1,4 @@
-import mogDevice_wavemeter.mogdevice as mogdevice
+import moglabs_fzw.mogdevice as mogdevice
 import time
 import numpy as np
 
