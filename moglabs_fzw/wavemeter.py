@@ -1,26 +1,27 @@
-import moglabs_fzw.mogdevice as mogdevice
+import mogdevice 
 import time
 import numpy as np
 
 class Wavemeter:
     _device = None
+    _addr = ''
 
 
     # parameterized consctor
-    def __init__(self, link):
-        
-        self._connect_to_wavemeter(link)
+    def __init__(self, address):
+        self._addr = address
+        self._connect_to_wavemeter(self._addr)
 
     
     # attempts to create a connecting with the wavemeter
-    def _connect_to_wavemeter(self, link, attempt=0):
+    def _connect_to_wavemeter(self, addr):
          #will ensure that it is not on its 10th connection attempt
         for i in range(10):
             try: 
-                self._device = mogdevice.MOGDevice(link)
+                self._device = mogdevice.MOGDevice(addr)
                 break
             except Exception as e:
-                print("wavemter connection error ",attempt, ":", e)
+                print("wavemter connection error ",i, ":", e)
                 time.sleep(1)
     
     # checks the connection to the wavemeter
@@ -41,14 +42,13 @@ class Wavemeter:
         
         # ensure that the index is a valid channel
         if(0 < channel_index <= 8):
-            print('index: ', channel_index)
             return Channel(self._device, channel_index)
         else:
             raise IndexError
         
     # makes a representation of the wavemeter object
     def __repr__(self):
-        return 'Wavemeter(\' \')'
+        return f'Wavemeter(\'{self._addr}\')'
 
 
 
@@ -75,11 +75,17 @@ class Channel:
         except RuntimeError:
             return 'Low Contrast'
         return value
+    
+
+    def __repr__(self):
+        return f'Channel ({self._index}): Wavelength: {self.wavelength}'
 
     @property
     def fringe(self):
         '''Returns the interference fringe as a numpy array'''
         return Fringe(self._device)
+    
+
     
     
     
@@ -108,3 +114,16 @@ class Fringe:
             return self._fringe
         else:
             raise IndexError
+        
+
+
+#remove numby array return as list,
+#
+## make function for each fringe list and one for all, remove channel object
+#  make setu0.py a setup.cfg
+
+
+
+
+
+# test the program
