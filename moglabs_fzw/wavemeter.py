@@ -1,4 +1,4 @@
-import mogdevice 
+from .mogdevice import MOGDevice
 import time
 
 class Wavemeter:
@@ -17,7 +17,7 @@ class Wavemeter:
          #will ensure that it is not on its 10th connection attempt
         for i in range(10):
             try: 
-                self._device = mogdevice.MOGDevice(addr)
+                self._device = MOGDevice(addr)
                 break
             except Exception as e:
                 print("wavemter connection error ",i, ":", e)
