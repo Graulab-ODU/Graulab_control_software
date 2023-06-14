@@ -8,6 +8,6 @@ setup(
     url='https://github.com/Graulab-ODU/Wavemeter_driver',
     author='Joshua Wager',
     author_email='josh.wager22@gmail.com',
-    packages=['moglabs_fzw', 'mogdevice']
+    packages=['moglabs_fzw']
 
 )
