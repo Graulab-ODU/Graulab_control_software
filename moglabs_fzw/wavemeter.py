@@ -20,7 +20,7 @@ class Wavemeter:
                 self._device = MOGDevice(addr)
                 break
             except Exception as e:
-                print("wavemter connection error ",i, ":", e)
+                print("wavemeter connection error ",i, ":", e)
                 time.sleep(1)
     
     # checks the connection to the wavemeter
