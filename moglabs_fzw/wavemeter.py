@@ -1,4 +1,4 @@
-from .mogdevice import MOGDevice
+from mogdevice import MOGDevice
 import time
 
 class Wavemeter:
@@ -61,13 +61,22 @@ class Channel:
         self._index = index
         self._device.ask('optsw,select,'+str(index))
 
+    @property
+    def frequency(self): 
+        #will call for the frequency, if it fails it will return 'low contrast'
+        try:
+            fq = self._device.ask('meas,freq')
+        except RuntimeError:
+            return 'Low Contrast'
+        return float(fq.replace('THz', ''))
+    
 
     @property
     def wavelength(self):
         # changes sockets the wavemeter is measuring
-        self._device.ask('optsw,select,'+str(self._index))
+        #self._device.ask('optsw,select,'+str(self._index))
 
-        #will attempt to measure the wavelength, if it fails it returns 'low contrast'
+        #will call for the wavelength, if it fails it returns 'low contrast'
         try:
             wl = self._device.ask('meas,wl,vac')
             value = float(wl.replace('nm(vac)', ''))
@@ -77,7 +86,7 @@ class Channel:
     
 
     def __repr__(self):
-        return f'(Channel {self._index}): Wavelength: {self.wavelength}'
+        return f'(Channel {self._index}), Wavelength: {self.wavelength} nm, Frequency: {self.frequency} THz'
 
     @property
     def fringe(self):
