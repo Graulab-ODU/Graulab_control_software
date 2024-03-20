@@ -1,5 +1,5 @@
-from moglabs_fzw import Wavemeter
-from DLC_Pro_Controller import Laser
+from .moglabs_fzw import Wavemeter
+from .DLC_Pro_Controller import Laser
 from simple_pid import PID
 import time
 
