@@ -1,4 +1,4 @@
-from mogdevice import MOGDevice
+from .mogdevice import MOGDevice
 import time
 
 class Wavemeter:
